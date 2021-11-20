@@ -1,0 +1,294 @@
+Open Anaconda comand prompt power shell
+
+---> Create virtual environment 
+
+conda create --name iris python=3.9.7
+
+y
+
+conda activate iris
+conda deactivate
+ 
+conda env list
+
+pip install pandas
+pip install pickle-mixin
+pip install sklearn
+pip install jupyter 
+
+#build the machine learning model in jupyter notebook
+conda activate iris 
+pip install flask
+
+Open pycharm 
+create new project --->select interpreter as cond enviornment
+create new file like app.py
+
+==========================app.py=======================
+from flask  import Flask, render_template, request
+import pickle
+import numpy as np
+
+model = pickle.load(open("iris_model.pkl","rb"))
+app = Flask(__name__)
+
+@app.route('/')
+
+def home():
+	return render_template("home.html")
+
+@app.route('/predict',methods =['POST'])
+def home():
+    data1 =request.form['a']
+    data2 =request.form['b']
+    data3 =request.form['c']
+    data4 =request.form['d']
+    arr =np.array([[data1,data2,data3,data4]])
+    pred =model.predict(arr)
+    return render_template("after.html", data=pred)
+
+
+if __name__ =="__main__":
+	app.run(debug=Ture,port =5000)
+Run the app
+--->pycharm terminal  
+--->python app.py 
+================================
+create directory (templates)
+---->create a file home.html
+
+<html>
+<head>
+<title>IRIS Deployment  </title>
+</head>
+<body>
+<center>
+<h1>Iris flower detection </h1><br>
+
+<form method="POST",action="{{url_for('home')}}">
+<br> first value : <input type="text",name="a", placeholder="enter 1"><br><br>
+second value : <input type="text",name="b", placeholder="enter 2"><br><br>
+Third value : <input type="text",name="c", placeholder="enter 3"><br><br>
+fourth value : <input type="text",name="d", placeholder="enter 4"><br><br>
+<input type="submit",value="pridict">
+
+</form>
+</center>
+</body>
+</html>
+==============================
+after.html
+
+<html>
+    <center>
+        <h1>
+            Predition
+        </h1>
+
+        {%if data==0%}
+        <h1> Iris setosa</h1>
+        <img src="static\setosa.jpg">
+
+        {%elif data == 1%}
+        <h1> Iris versicolor</h1>
+        <img src="static\versicolor.jpg">
+
+
+        {%else%}
+        <h1> Iris virginca</h1>
+        <img src="static\virginca.jpg">
+
+        <br><br>
+        <a href="/">go back to home page</a>
+    </center>
+</html>
+================================
+create one new file (profile) dont given any extension
+
+web :  gunicorn app:app
+==============================
+pip install gunicorn
+
+Create file requesrment.txt by using below command 
+
+pip freeze >requirements.txt
+
+--->one file wil create
+
+----> you cant create the runtime.txt in git hub mentioning python viesion
+	python-3.9.7
+=============================
+Heroku is paas(paltform as a serivce)
+Create account in herouku
+
+--->new 
+--> app name
+---> create app
+--> select the deployment method  heroku git or git HUB or container
+---> we select git  hub
+
+---> link the git account and give repository name 
+---> select the ENable automatic deploys or deploy branch(manualy)
+===============================================================
+AWS is IAAS infrastructure as serivce
+
+We are deploying amazone EC2 server
+
+downaload the follwing the softwares 
+----> WinSCP --> to drag the all files from local macine to server
+---->Putty ---> interact with terminal 
+-----> Puttygen ---> create private key
+
+
+Create AWS account 
+
+AWS console 
+select with EC2  lunch virtual machine 
+
+---> instances
+----> Lunch new instances
+-----> select the free version ubuntu 2.40 version
+------> select t2 micro (green color option)
+------> review and lunch
+----->lunch
+-----> create key pair
+------> we are giving key pair name is "Iris key1"
+------> download key pair
+------> save key pair file in local system( the pemp file )
+
+-----> Under netowk and security 
+----> click on security group 
+---> name security group name (iris_flower_fa)
+---->description  give same as group name (iris_flower_fa)
+---->inbund  rules 
+----> add rule 
+----> all trafic
+-----> select source (anywhere)
+-----> create security group
+===================
+----> go to network internface 
+-----> click on instance check on which instance is run remember id 
+----->in network interface select correct one(using id)
+------> right click on instance id---> change security group
+------>add security group which we recently create --->add security group
+------> save 
+
+
+========================
+open puttygen---> load the key
+select the file esxtestion all
+----> select the iris_key.pem file 
+---->messege will get successfullly imported foreign key 
+-----> save private key
+-----> give private key file name as "Iris _flower _key" save
+task compalted close the window 
+=================================
+goto instance in aws 
+----> select the instance which runing (correct)
+----> click  on actions--> connect
+----> click on SHH  client 
+----> click on public DNS---> copy the link
+
+----> Go to WinSCP  paste into host name
+----> click on adavace---> SHH--> authentication
+-----> click on private key and browse the private key-->open
+-----> ok --> login
+-----> yes---> give server name "ubantu"
+-----> transfer the file manually by drag drop
+------> files , static, templates, app.py,requirements.txt, iris_model.pkl
+
+in app.py model some changes done
+
+if __name__ == "__main__":
+	app.run(host ='0.0.0.0',port=8080)
+always keep port number 8080 in webserver deployment 
+
+
+
+===================
+open putty 
+
+give host name which you coppy from aws
+---->ssh
+--->under shh -->auth---> browser private key-->don't open directly
+goto session -->save the session by giving name --> save
+---> click on saved session-->open-->accept
+-->login: ubuntu--->press enter
+--> clear screen
+--> enter the commands
+
+---> check python vesion
+python3 --version
+ 
+sudo apt update && sudo apt upgrade
+-->y
+
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt update
+sudo apt install python3.7
+sudo update-alternative --install /usr/bin/python3 python3 /usr/binpython3.7 1
+sudo update-alternative --install /usr/bin/python3 python3 /usr/binpython3.8 2
+sudo update-alternative --config python3
+select the pyhon version
+--->1  hit enter
+python3 --version
+
+sudo apt-get install -y python3-pip
+pip --version
+ls
+pip install -r requirements.txt
+clear
+#(run server)
+python3 app.y
+
+open browser :dns serverlink/8080
+
+=======================================================
+Google cloud deployment 
+
+create an accout first
+
+change the file from app.py to main.py
+===========> 
+in py charm creat new file (appyaml)don't give any extesntion
+
+in file mention
+runtime: python37
+-------------------------
+goto menu 
+i am admin --> manger resources
+click on create project
+give project name (iris flower)
+---> click on create 
+---->download google cloud sdk-->windows
+----> copy link --> paste web browser --> file will download --> install
+----> open google cloud sdk shell local system
+----> cd C:\Users\Adarsh\iris_flower
+--->gcloud init
+---->choose 1 -->hit enter
+---> choose the account
+---->1
+--->choose project 
+---->1
+---->gcloud app deploy app.yaml --project iris_flower_1801
+---->choose region
+---->y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+I

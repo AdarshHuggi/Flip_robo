@@ -1,0 +1,53 @@
+
+----------------file name is "main.py"--------------------------
+from func import abc, xyz
+from flask import flask, request,jsonify
+
+app =flask(__name__)
+
+@app.route("/results",methods=["GET"])
+def main():
+	data=abc():
+	return jsonify("table":data)
+-----------------------------code not tested this part-------------
+@app.route("/credit_result", method="post")
+def main1():
+	model = joblib.load("model_name.pkl")
+	sal =request.json(['sal'])
+	ten =request.json(['ten'])
+	prediction =model.predict([sal,ten])
+	return prediction
+--------------------------up to here  ---------------------------------
+if __name__ =="__main__":
+app.run(host="", port=8080, debug=True)
+
+
+
+========================Func.py==================
+def abc():
+	return [i for i in range(2,21) if i%2==0]
+
+def xyz():
+	retrun {i:i for i in range(2,30) if i%2==0}
+
+===================================================
+method :
+1.get-->
+2.post -->
+3.put --> add the elements 
+4.update---> updating the data
+5.delete
+======================post method example===============
+-------post method used to take the inputs from the user or client------
+
+from func import abc, xyz
+from flask import flask, request,jsonify
+import json
+
+app=Flask(__name__)
+@app.rout("/multipication", methods=["post"])
+def main():
+	x=int(request.json['x'])
+	y=int(request.json['y'])
+	return jsonify(x*y)
+	
